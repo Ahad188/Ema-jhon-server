@@ -8,7 +8,7 @@ app.use(cors())
 app.use(express.json())
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ejfmzqt.mongodb.net/?retryWrites=true&w=majority`;
  
  
@@ -38,7 +38,16 @@ async function run() {
     app.get('/totalproducts', async(req,res)=>{
      const result = await productCollection.estimatedDocumentCount()
      res.send({totalProduct:result})
-    })
+    });
+
+    app.post('/productsByIds', async(req, res) => {
+     const ids = req.body;
+     const objectIds = ids.map(id => new ObjectId(id));
+     const query = { _id: { $in: objectIds } }
+     console.log(ids);
+     const result = await productCollection.find(query).toArray();
+     res.send(result);
+   })
 
 
 
